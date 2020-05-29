@@ -45,8 +45,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final int MAX_LENGTH = 15;
-
+  static const int MAX_LENGTH = 15;
+  static const String ERROR_DIVIDE_BY_ZERO = 'Error: divide by zero';
   Decimal _currentValue = Decimal.parse('0');
 
   String _integerString;
@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _displayedValue = '0';
   bool _insertNewValue = true;
   bool _allowCalculate = true;
+  bool _allowBackspace = true;
 
   Operator _currentOperator = Operator.NONE;
   RegExp _reg = new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
@@ -63,6 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _calculate(Operator _newOperator, String _newValue) {
     setState(() {
+
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
+      {
+        return;
+      }
 
       if (!_allowCalculate)
       {
@@ -74,6 +80,17 @@ class _MyHomePageState extends State<MyHomePage> {
       Decimal _dValue = Decimal.parse(_newValue);
 
       _insertNewValue = true;
+      _allowBackspace = false;
+
+      if (_currentOperator == Operator.DIVIDE && _dValue == Decimal.parse('0'))
+      {
+        _displayedValue = ERROR_DIVIDE_BY_ZERO;
+        _allowCalculate = false;
+        _currentOperator = Operator.NONE;
+        _currentValue = Decimal.parse('0');
+
+        return;
+      }
 
       switch (_currentOperator) {
         case Operator.ADD:
@@ -147,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
       {
         return;
       }
-      
+
       if (_insertNewValue)
       {
         _tempString = _newValue;
@@ -158,9 +175,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _tempString += _newValue;
       }
 
-      _formatText(_tempString); //still buggy if insert xx.0
+      _formatText(_tempString);
 
       _allowCalculate = true;
+      _allowBackspace = true;
     }
     );
   }
@@ -168,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _formatText(String _inValue)
   {
     setState(() {
-      if (_inValue.length > MAX_LENGTH || _inValue.contains('e'))
+      if (_inValue.length > MAX_LENGTH || _inValue.contains('e+'))
       {
         _displayedValue = Decimal.parse(_inValue).toStringAsExponential();
       }
@@ -196,18 +214,54 @@ class _MyHomePageState extends State<MyHomePage> {
   void _negate()
   {
     setState(() {
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
+      {
+        return;
+      }
+
       Decimal _dValue = Decimal.parse(_displayedValue.replaceAll(',', ''));
       _dValue = Decimal.parse('-1.0') * _dValue;
-      _displayedValue = _dValue.toString().replaceAllMapped(_reg, _mathFunc);
+      _formatText(_dValue.toString());
     });
   }
 
   void _percentage()
   {
     setState(() {
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
+      {
+        return;
+      }
+
+      _allowBackspace = false;
+      _insertNewValue = true;
+
       Decimal _dValue = Decimal.parse(_displayedValue.replaceAll(',', ''));
       _dValue = _dValue / Decimal.parse('100.0');
       _formatText(_dValue.toString());
+    });
+  }
+
+  void _backspace()
+  {
+    setState(() {
+
+      if (_allowBackspace)
+      {
+        String _tempStr = _displayedValue.replaceAll(',', '');
+
+        if (_tempStr.length == 1 || (_tempStr.length == 2 && _tempStr.substring(0, 1) == '-' ))
+        {
+          _tempStr = '0';
+          _insertNewValue = true;
+        }
+        else
+        {
+          _tempStr = _tempStr.substring(0, _tempStr.length - 1);
+        }
+
+        _formatText(_tempStr);
+      }
     });
   }
 
@@ -218,6 +272,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _displayedValue = '0';
       _insertNewValue = true;
       _allowCalculate = true;
+      _allowBackspace = true;
       _currentOperator = Operator.NONE;
     });
   }
@@ -229,28 +284,34 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'current value : $_currentValue',
-              style: Theme.of(context).textTheme.bodyText1,
+//            Text(
+//              'current value : $_currentValue',
+//              style: Theme.of(context).textTheme.bodyText1,
+//            ),
+//            Text(
+//              'display value : $_displayedValue',
+//              style: Theme.of(context).textTheme.bodyText1,
+//            ),
+//            Text(
+//              'current operator : $_currentOperator',
+//              style: Theme.of(context).textTheme.bodyText1,
+//            ),
+//            Text(
+//              'allow calculate : $_allowCalculate',
+//              style: Theme.of(context).textTheme.bodyText1,
+//            ),
+            new Row (
+              mainAxisAlignment: MainAxisAlignment.end,
+                children : <Widget>[
+                    Text(
+                      //Main Display
+                      '$_displayedValue',
+                      style: Theme.of(context).textTheme.headline4,
+                      textAlign: TextAlign.right,
+                    ),
+              ],
             ),
-            Text(
-              'display value : $_displayedValue',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            Text(
-              'current operator : $_currentOperator',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            Text(
-              'allow calculate : $_allowCalculate',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            Text(
-              //Main Display
-              '$_displayedValue',
-              style: Theme.of(context).textTheme.headline4,
-              textAlign: TextAlign.right,
-            ),
+
             new Divider(
               color: Colors.grey,
             ),
@@ -259,15 +320,15 @@ class _MyHomePageState extends State<MyHomePage> {
               children : <Widget>[
                 FlatButton (
                 onPressed: () =>_reset(),
-                  child: new Text('C', style: Theme.of(context).textTheme.headline5,),
+                  child: new Text('AC', style: Theme.of(context).textTheme.headline5,),
+                ),
+                FlatButton (
+                  onPressed: _backspace,
+                  child: new Text('⌫', style: Theme.of(context).textTheme.headline5,),
                 ),
                 FlatButton (
                 onPressed: _percentage,
                   child: new Text('%', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-//                onPressed: () =>_updateText('9'),
-                  child: new Text('_', style: Theme.of(context).textTheme.headline5,),
                 ),
                 FlatButton (
                   onPressed: () => _calculate(Operator.DIVIDE, _displayedValue),
