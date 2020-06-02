@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
@@ -6,6 +7,27 @@ enum Operator { ADD, SUBSTRACT, MULTIPLY, DIVIDE, EQUALS, NONE }
 
 void main() {
   runApp(MyApp());
+}
+
+class CustomTextStyle {
+  static TextStyle mainDisplay(BuildContext context) {
+    return Theme.of(context)
+        .textTheme
+        .headline2
+        .copyWith(color: Colors.grey[200], fontFamily: 'Nunito');
+  }
+
+  static TextStyle numbers(BuildContext context) {
+    return Theme.of(context)
+        .textTheme
+        .headline4
+        .copyWith(color: Colors.grey[600], fontFamily: 'Nunito');
+  }
+
+  static TextStyle operators(BuildContext context) {
+    return Theme.of(context).textTheme.headline4.copyWith(
+        color: Color.fromRGBO(147, 112, 219, 1.0), fontFamily: 'Nunito');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -21,6 +43,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -39,7 +62,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //TODO : bug, press equals then press 0 twice then press other number
   static const int MAX_LENGTH = 15;
   static const String ERROR_DIVIDE_BY_ZERO = 'Error: divide by zero';
   Decimal _currentValue = Decimal.parse('0');
@@ -251,26 +273,38 @@ class _MyHomePageState extends State<MyHomePage> {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: new Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  new Container(
-                    padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      //Main Display
-                      '$_displayedValue',
-                      style: Theme.of(context).textTheme.headline2,
-                      textAlign: TextAlign.right,
+              child: new Container(
+                color: Color.fromRGBO(147, 112, 219, 1.0),
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    new Container(
+                      padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                      alignment: Alignment.centerRight,
+                      color: Color.fromRGBO(147, 112, 219, 1.0),
+                      child: AutoSizeText(
+                        //Main Display
+                        '$_displayedValue',
+                        style: CustomTextStyle.mainDisplay(context),
+                        textAlign: TextAlign.right,
+                        maxLines: 1,
+                      ),
                     ),
-                  ),
-                  new Container(
-                    padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                    child: new Divider(
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+            ),
+            new ClipRRect(
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                  topLeft: Radius.circular(0),
+                  topRight: Radius.circular(0)),
+              child: new Container(
+                color: Color.fromRGBO(147, 112, 219, 1.0),
+                child: new Divider(
+                  color: Color.fromRGBO(147, 112, 219, 1.0),
+                ),
               ),
             ),
             Flexible(
@@ -287,7 +321,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _reset(),
                           child: new Text(
                             'AC',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -296,7 +330,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: _backspace,
                           child: new Text(
                             '\u232B', //backspace symbol
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -305,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: _percentage,
                           child: new Text(
                             '%',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -315,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _calculate(Operator.DIVIDE, _displayedValue),
                           child: new Text(
                             '\u00F7', //divide symbol
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -330,7 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('7'),
                           child: new Text(
                             '7',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -339,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('8'),
                           child: new Text(
                             '8',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -348,7 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('9'),
                           child: new Text(
                             '9',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -358,7 +392,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _calculate(Operator.MULTIPLY, _displayedValue),
                           child: new Text(
                             '\u00d7', //multiple symbol
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -373,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('4'),
                           child: new Text(
                             '4',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -382,7 +416,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('5'),
                           child: new Text(
                             '5',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -391,7 +425,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('6'),
                           child: new Text(
                             '6',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -401,7 +435,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _calculate(Operator.SUBSTRACT, _displayedValue),
                           child: new Text(
                             '-',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -416,7 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('1'),
                           child: new Text(
                             '1',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -425,7 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('2'),
                           child: new Text(
                             '2',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -434,7 +468,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('3'),
                           child: new Text(
                             '3',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -444,7 +478,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _calculate(Operator.ADD, _displayedValue),
                           child: new Text(
                             '+',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -459,7 +493,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: _negate,
                           child: new Text(
                             '+/-',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -468,7 +502,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('0'),
                           child: new Text(
                             '0',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.numbers(context),
                           ),
                         ),
                       ),
@@ -477,7 +511,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () => _updateText('.'),
                           child: new Text(
                             '.',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
@@ -487,7 +521,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _calculate(Operator.EQUALS, _displayedValue),
                           child: new Text(
                             '=',
-                            style: Theme.of(context).textTheme.headline4,
+                            style: CustomTextStyle.operators(context),
                           ),
                         ),
                       ),
