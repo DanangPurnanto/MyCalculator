@@ -1,14 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
 
-enum Operator {
-  ADD,
-  SUBSTRACT,
-  MULTIPLY,
-  DIVIDE,
-  EQUALS,
-  NONE
-}
+enum Operator { ADD, SUBSTRACT, MULTIPLY, DIVIDE, EQUALS, NONE }
 
 void main() {
   runApp(MyApp());
@@ -45,6 +39,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //TODO : bug, press equals then press 0 twice then press other number
   static const int MAX_LENGTH = 15;
   static const String ERROR_DIVIDE_BY_ZERO = 'Error: divide by zero';
   Decimal _currentValue = Decimal.parse('0');
@@ -64,14 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _calculate(Operator _newOperator, String _newValue) {
     setState(() {
-
-      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
-      {
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO) {
         return;
       }
 
-      if (!_allowCalculate)
-      {
+      if (!_allowCalculate) {
         _currentOperator = _newOperator;
         return;
       }
@@ -82,8 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _insertNewValue = true;
       _allowBackspace = false;
 
-      if (_currentOperator == Operator.DIVIDE && _dValue == Decimal.parse('0'))
-      {
+      if (_currentOperator == Operator.DIVIDE &&
+          _dValue == Decimal.parse('0')) {
         _displayedValue = ERROR_DIVIDE_BY_ZERO;
         _allowCalculate = false;
         _currentOperator = Operator.NONE;
@@ -94,32 +86,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
       switch (_currentOperator) {
         case Operator.ADD:
-          print ('ADD');
+          print('ADD');
           _currentValue += _dValue;
           _allowCalculate = false;
           break;
         case Operator.SUBSTRACT:
-          print ('SUBSTRACT');
+          print('SUBSTRACT');
           _currentValue -= _dValue;
           _allowCalculate = false;
           break;
         case Operator.MULTIPLY:
-          print ('MULTIPLY');
+          print('MULTIPLY');
           _currentValue *= _dValue;
           _allowCalculate = false;
           break;
         case Operator.DIVIDE:
-          print ('DIVIDE');
+          print('DIVIDE');
           _currentValue /= _dValue;
           _allowCalculate = false;
           break;
         case Operator.EQUALS:
-          print ('EQUALS');
+          print('EQUALS');
           _currentValue = _dValue;
           _allowCalculate = true;
           break;
         case Operator.NONE:
-          print ('NONE');
+          print('NONE');
           _currentValue = _dValue;
           _allowCalculate = false;
           break;
@@ -131,47 +123,35 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _updateText(String _newValue)
-  {
+  void _updateText(String _newValue) {
     String _tempString = _displayedValue.replaceAll(',', '');
     setState(() {
-
-      if (!_insertNewValue && _tempString.length > MAX_LENGTH - 1)
-      {
+      if (!_insertNewValue && _tempString.length > MAX_LENGTH - 1) {
         return;
       }
 
-      if (_newValue == '.')
-      {
-        if (_insertNewValue)
-        {
+      if (_newValue == '.') {
+        if (_insertNewValue) {
           _displayedValue = '0.';
           _insertNewValue = false;
           return;
-        }
-        else if (_displayedValue.contains('.'))
-        {
+        } else if (_displayedValue.contains('.')) {
           return;
-        }
-        else
-        {
+        } else {
           _displayedValue += _newValue;
           return;
         }
       }
 
-      if (_newValue == '0' && _displayedValue == '0')
-      {
+      if (_newValue == '0' && _displayedValue == '0') {
+        _insertNewValue = true;
         return;
       }
 
-      if (_insertNewValue)
-      {
+      if (_insertNewValue) {
         _tempString = _newValue;
         _insertNewValue = false;
-      }
-      else
-      {
+      } else {
         _tempString += _newValue;
       }
 
@@ -179,43 +159,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
       _allowCalculate = true;
       _allowBackspace = true;
-    }
-    );
+    });
   }
 
-  void _formatText(String _inValue)
-  {
+  void _formatText(String _inValue) {
     setState(() {
-      if (_inValue.length > MAX_LENGTH || _inValue.contains('e+'))
-      {
+      if (_inValue.length > MAX_LENGTH || _inValue.contains('e+')) {
         _displayedValue = Decimal.parse(_inValue).toStringAsExponential();
-      }
-      else
-      {
+      } else {
         String _tempStr = _inValue;
 
         final index = _tempStr.indexOf('.');
 
-        if (index >= 0)
-        {
+        if (index >= 0) {
           _integerString = _tempStr.substring(0, index);
           _fractString = _tempStr.substring(index + 1, _tempStr.length);
-          _integerString = _integerString.toString().replaceAllMapped(_reg, _mathFunc);
+          _integerString =
+              _integerString.toString().replaceAllMapped(_reg, _mathFunc);
           _displayedValue = _integerString + '.' + _fractString;
-        }
-        else
-        {
-          _displayedValue = _inValue.toString().replaceAllMapped(_reg, _mathFunc);
+        } else {
+          _displayedValue =
+              _inValue.toString().replaceAllMapped(_reg, _mathFunc);
         }
       }
     });
   }
 
-  void _negate()
-  {
+  void _negate() {
     setState(() {
-      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
-      {
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO) {
         return;
       }
 
@@ -225,11 +197,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _percentage()
-  {
+  void _percentage() {
     setState(() {
-      if (_displayedValue == ERROR_DIVIDE_BY_ZERO)
-      {
+      if (_displayedValue == ERROR_DIVIDE_BY_ZERO) {
         return;
       }
 
@@ -242,21 +212,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _backspace()
-  {
+  void _backspace() {
     setState(() {
-
-      if (_allowBackspace)
-      {
+      if (_allowBackspace) {
         String _tempStr = _displayedValue.replaceAll(',', '');
 
-        if (_tempStr.length == 1 || (_tempStr.length == 2 && _tempStr.substring(0, 1) == '-' ))
-        {
+        if (_tempStr.length == 1 ||
+            (_tempStr.length == 2 && _tempStr.substring(0, 1) == '-')) {
           _tempStr = '0';
           _insertNewValue = true;
-        }
-        else
-        {
+        } else {
           _tempStr = _tempStr.substring(0, _tempStr.length - 1);
         }
 
@@ -265,8 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _reset()
-  {
+  void _reset() {
     setState(() {
       _currentValue = Decimal.parse('0');
       _displayedValue = '0';
@@ -282,143 +246,256 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-//            Text(
-//              'current value : $_currentValue',
-//              style: Theme.of(context).textTheme.bodyText1,
-//            ),
-//            Text(
-//              'display value : $_displayedValue',
-//              style: Theme.of(context).textTheme.bodyText1,
-//            ),
-//            Text(
-//              'current operator : $_currentOperator',
-//              style: Theme.of(context).textTheme.bodyText1,
-//            ),
-//            Text(
-//              'allow calculate : $_allowCalculate',
-//              style: Theme.of(context).textTheme.bodyText1,
-//            ),
-            new Row (
-              mainAxisAlignment: MainAxisAlignment.end,
-                children : <Widget>[
-                    Text(
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: new Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  new Container(
+                    padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                    alignment: Alignment.centerRight,
+                    child: Text(
                       //Main Display
                       '$_displayedValue',
-                      style: Theme.of(context).textTheme.headline4,
+                      style: Theme.of(context).textTheme.headline2,
                       textAlign: TextAlign.right,
                     ),
-              ],
+                  ),
+                  new Container(
+                    padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                    child: new Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
             ),
-
-            new Divider(
-              color: Colors.grey,
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children : <Widget>[
-                FlatButton (
-                onPressed: () =>_reset(),
-                  child: new Text('AC', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: _backspace,
-                  child: new Text('⌫', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                onPressed: _percentage,
-                  child: new Text('%', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () => _calculate(Operator.DIVIDE, _displayedValue),
-                  child: new Text('÷', style: Theme.of(context).textTheme.headline5,),
-                ),
-              ],
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children : <Widget>[
-                FlatButton (
-                  onPressed: () =>_updateText('7'),
-                  child: new Text('7', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('8'),
-                  child: new Text('8', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('9'),
-                  child: new Text('9', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () => _calculate(Operator.MULTIPLY, _displayedValue),
-                  child: new Text('x', style: Theme.of(context).textTheme.headline5,),
-                ),
-              ],
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children : <Widget>[
-                FlatButton (
-                  onPressed: () =>_updateText('4'),
-                  child: new Text('4', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('5'),
-                  child: new Text('5', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('6'),
-                  child: new Text('6', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () => _calculate(Operator.SUBSTRACT, _displayedValue),
-                  child: new Text('-', style: Theme.of(context).textTheme.headline5,),
-                ),
-              ],
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children : <Widget>[
-                FlatButton (
-                  onPressed: () =>_updateText('1'),
-                  child: new Text('1', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('2'),
-                  child: new Text('2', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('3'),
-                  child: new Text('3', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () => _calculate(Operator.ADD, _displayedValue),
-                  child: new Text('+', style: Theme.of(context).textTheme.headline5,),
-                ),
-              ],
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children : <Widget>[
-                FlatButton (
-                  onPressed: _negate,
-                  child: new Text('+/-', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('0'),
-                  child: new Text('0', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () =>_updateText('.'),
-                  child: new Text('.', style: Theme.of(context).textTheme.headline5,),
-                ),
-                FlatButton (
-                  onPressed: () => _calculate(Operator.EQUALS, _displayedValue),
-                  child: new Text('=', style: Theme.of(context).textTheme.headline5,),
-                ),
-              ],
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: new Column(
+                children: <Widget>[
+                  Spacer(flex: 1),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _reset(),
+                          child: new Text(
+                            'AC',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: _backspace,
+                          child: new Text(
+                            '\u232B', //backspace symbol
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: _percentage,
+                          child: new Text(
+                            '%',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              _calculate(Operator.DIVIDE, _displayedValue),
+                          child: new Text(
+                            '\u00F7', //divide symbol
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Spacer(flex: 1),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('7'),
+                          child: new Text(
+                            '7',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('8'),
+                          child: new Text(
+                            '8',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('9'),
+                          child: new Text(
+                            '9',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              _calculate(Operator.MULTIPLY, _displayedValue),
+                          child: new Text(
+                            '\u00d7', //multiple symbol
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Spacer(flex: 1),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('4'),
+                          child: new Text(
+                            '4',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('5'),
+                          child: new Text(
+                            '5',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('6'),
+                          child: new Text(
+                            '6',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              _calculate(Operator.SUBSTRACT, _displayedValue),
+                          child: new Text(
+                            '-',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Spacer(flex: 1),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('1'),
+                          child: new Text(
+                            '1',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('2'),
+                          child: new Text(
+                            '2',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('3'),
+                          child: new Text(
+                            '3',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              _calculate(Operator.ADD, _displayedValue),
+                          child: new Text(
+                            '+',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Spacer(flex: 1),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: _negate,
+                          child: new Text(
+                            '+/-',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('0'),
+                          child: new Text(
+                            '0',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () => _updateText('.'),
+                          child: new Text(
+                            '.',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              _calculate(Operator.EQUALS, _displayedValue),
+                          child: new Text(
+                            '=',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Spacer(flex: 1),
+                ],
+              ),
             ),
           ],
         ),
